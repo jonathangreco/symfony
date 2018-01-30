@@ -7,21 +7,41 @@ parameters:
 
 doctrine:
     dbal:
-        # configure these for your database server
-        driver: 'pdo_mysql'
-        server_version: '5.7'
-        charset: utf8mb4
+        default_connection: hooli
+        connections:
+            hooli:
+                driver: 'pdo_pgsql'
+                server_version: '9.4'
+                url: '%env(resolve:DB_HOOLI_URL)%'
+                charset: UTF8
+            customer:
+                driver: 'pdo_pgsql'
+                server_version: '9.4'
+                url: '%env(resolve:DB_CUSTOMER_URL)%'
+                charset: UTF8
 
-        # With Symfony 3.3, remove the `resolve:` prefix
-        url: '%env(resolve:DATABASE_URL)%'
     orm:
+        default_entity_manager: hooli
         auto_generate_proxy_classes: '%kernel.debug%'
-        naming_strategy: doctrine.orm.naming_strategy.underscore
-        auto_mapping: true
-        mappings:
-            App:
-                is_bundle: false
-                type: annotation
-                dir: '%kernel.project_dir%/src/Entity'
-                prefix: 'App\Entity'
-                alias: App
+        entity_managers:
+            hooli:
+                naming_strategy: doctrine.orm.naming_strategy.underscore
+                auto_mapping: true
+                connection: hooli
+                mappings:
+                    Main:
+                        is_bundle: false
+                        type: annotation
+                        dir: '%kernel.project_dir%/src/Entity/Hooli'
+                        prefix: 'App\Entity\Hooli'
+                        alias: Hooli
+            customer:
+                naming_strategy: doctrine.orm.naming_strategy.underscore
+                connection: customer
+                mappings:
+                    Customer:
+                        is_bundle: false
+                        type: annotation
+                        dir: '%kernel.project_dir%/src/Entity/Customer'
+                        prefix: 'App\Entity\Customer'
+                        alias: Customer
